@@ -564,18 +564,18 @@ const fmt = r => r<10 ? r.toFixed(1) : r.toFixed(0);
 const rangeTxt = rr => rr[0]===rr[1] ? fmt(rr[0])+"%" : fmt(rr[0])+"–"+fmt(rr[1])+"%";
 
 function guideline(){
-  const bad=[], warn=[], bmi=bmiOf(), c=S.conds;
-  FLAGS.forEach(f=>{ if(S.flags[f.k]) bad.push(f.t); });
+  const bad=[], warn=[], bmi=bmiOf(), c=S.conds; let temp=false;
+  FLAGS.forEach(f=>{ if(S.flags[f.k]){ bad.push(f.t); if(["preg","chemo","admit","tb"].includes(f.k)) temp=true; } });
   if(bmi!==null && bmi>=37.5) bad.push(`BMI ${bmi.toFixed(1)} (37.5 atau lebih)`);
   if(S.mrs==="4") bad.push("Tidak boleh berjalan tanpa dipimpin orang, atau perlu bantuan untuk mandi dan ke tandas");
-  if(c.dm && S.hba1c==="gt10") bad.push("HbA1c lebih daripada 10%");
+  if(c.dm && S.hba1c==="gt10"){ bad.push("HbA1c lebih daripada 10%"); temp=true; }
   if(c.dm && S.hba1c==="85to10") warn.push("HbA1c 8.5% hingga 10%: perlu dinilai oleh pakar");
   if(c.dm && (S.hba1c==="unk" || !S.hba1c)) warn.push("HbA1c belum diketahui: buat ujian HbA1c sebelum saringan");
   if(S.mrs==="3") warn.push("Perlu bantuan orang untuk sesetengah urusan: perlu ujian kekuatan kaki (30-Second Sit To Stand)");
   if(!S.hbUnk && S.hb!=null && S.hb<10) warn.push(`Hb ${S.hb} g/dL (bawah 10): perlu rawatan anemia sebelum berangkat`);
   if(c.sle) warn.push("SLE: perlu dinilai oleh doktor pakar yang merawat");
   if(bmi!==null && bmi>=32.5 && bmi<37.5) warn.push("BMI 32.5 hingga 37.4: perlu saringan apnea tidur");
-  return {bad, warn};
+  return {bad, warn, temp};
 }
 function advice(){
   const c=S.conds, bmi=bmiOf(), a=[], h2=S.ht?(S.ht/100)**2:null;
@@ -595,7 +595,7 @@ function advice(){
     : "Kolesterol LDL ikut tahap risiko jantung anda: bawah 3.0 mmol/L, atau bawah 2.6 mmol/L jika risiko tinggi";
   /* personalised: risk tier, age, exercise plan */
   const rrA = riskRange(), tierA = rrA ? tierOf(rrA[1]) : null, ag = S.age||0;
-  if(tierA===2) g("⚠️", "Risiko anda tinggi", [`Kurangkan risiko dengan mengawal faktor yang boleh diubah sebelum berangkat`], [
+  if(tierA===2 && !guideline().bad.length) g("⚠️", "Risiko anda tinggi", [`Kurangkan risiko dengan mengawal faktor yang boleh diubah sebelum berangkat`], [
     "Buat temujanji dengan doktor sekurang-kurangnya 3 bulan sebelum berangkat untuk menilai dan mengoptimumkan rawatan.",
     "Bawa keputusan ini dan senarai ubat anda semasa berjumpa doktor.",
     "Maklumkan kepada petugas kesihatan rombongan tentang penyakit anda sebaik tiba di Tanah Suci.",
@@ -781,25 +781,28 @@ function sync(){
   bc.className = "chip" + (bmi ? (bmi<18.5||bmi>=27.5 ? " hi" : bmi>=23 ? " mid" : " ok") : "");
   $("hb").disabled = !!S.hbUnk;
   $("dmBox").hidden = !S.conds.dm;
-  const rr = riskRange();
-  $("barVal").textContent = rr ? TIERS[tierOf(rr[1])].short : "Isi profil";
-  $("barVal").style.color = rr ? `var(--${TIERS[tierOf(rr[1])].k})` : "";
-  renderResult(rr, guideline());
+  const rr = riskRange(), gg = guideline();
+  $("barVal").textContent = gg.bad.length ? "Tidak layak" : rr ? TIERS[tierOf(rr[1])].short : "Isi profil";
+  $("barVal").style.color = gg.bad.length ? "var(--ink)" : rr ? `var(--${TIERS[tierOf(rr[1])].k})` : "";
+  $("barVal").style.fontSize = gg.bad.length ? ".9rem" : "";
+  $("barVal").style.whiteSpace = gg.bad.length ? "normal" : "";
+  $("barVal").previousElementSibling.textContent = gg.bad.length ? "Status" : "Tahap risiko";
+  renderResult(rr, gg);
 }
 function renderResult(rr,g){
   let al = "";
-  if(g.bad.length) al += `<div class="alert bad"><span class="ai">${svg("alert")}</span><div><h3>Mungkin tidak memenuhi syarat saringan</h3><p>Keadaan berikut biasanya tidak diluluskan semasa saringan kesihatan:</p><ul>${g.bad.map(x=>`<li>${x}</li>`).join("")}</ul></div></div>`;
+  if(g.bad.length) al += `<div class="alert bad"><span class="ai">${svg("alert")}</span><div><h3>Tidak memenuhi syarat kesihatan untuk menunaikan haji</h3><p>Berdasarkan maklumat anda, keadaan berikut tidak dibenarkan untuk menunaikan haji:</p><ul>${g.bad.map(x=>`<li>${x}</li>`).join("")}</ul>${g.temp?`<p style="margin-top:10px">Keadaan sementara seperti hamil, rawatan kanser, tibi, baru keluar wad atau HbA1c tinggi boleh dinilai semula selepas rawatan atau selepas tempoh tertentu.</p>`:""}<p style="margin-top:10px"><b>Sila jumpa doktor anda.</b> Keputusan rasmi dibuat semasa saringan kesihatan. Anggaran risiko tidak dipaparkan untuk keadaan ini.</p></div></div>`;
   else al += `<div class="alert good"><span class="ai">${svg("check")}</span><div><h3>Tiada kriteria gagal dikesan</h3><p>Tiada keadaan yang biasanya menyebabkan gagal saringan.</p></div></div>`;
   if(g.warn.length) al += `<div class="alert warn"><span class="ai">${svg("info")}</span><div><h3>Perlu penilaian lanjut oleh doktor</h3><ul>${g.warn.map(x=>`<li>${x}</li>`).join("")}</ul></div></div>`;
   $("alerts").innerHTML = al;
-  const rc = $("resultCard");
+  const rc = $("resultCard"); rc.hidden = !!g.bad.length;
   if(!rr){ rc.innerHTML = `<h2>Anggaran risiko</h2><p class="sub">Lengkapkan jantina, umur, tinggi dan berat di langkah 1.</p>`; $("advCard").innerHTML=""; return; }
   const hi=rr[1], t=tierOf(hi), T=TIERS[t], times=hi/COHORT;
   const cmp = times>=1.15 ? `Lebih kurang ${times.toFixed(1)} kali purata jemaah (${COHORT}%)` : times<=0.85 ? `Lebih rendah daripada purata jemaah (${COHORT}%)` : `Hampir sama dengan purata jemaah (${COHORT}%)`;
   const MSG=[{w:"RISIKO RENDAH",m:"Kebanyakan jemaah seperti anda menunaikan haji tanpa masalah kesihatan yang serius.",a:"Teruskan persediaan dan jaga kesihatan anda."},
     {w:"RISIKO SEDERHANA",m:"Risiko anda hampir sama seperti kebanyakan jemaah haji.",a:"Kawal penyakit anda dan ikut nasihat di bawah."},
     {w:"RISIKO TINGGI",m:"Maknanya kebanyakan jemaah seperti anda selamat, tetapi peluang anda lebih tinggi, jadi anda perlu lebih bersedia.",a:"Jumpa doktor sekurang-kurangnya 3 bulan sebelum berangkat."}][t];
-  const freq = hi<1 ? `Kurang daripada <b>1 daripada 100</b> jemaah seperti anda jatuh sakit teruk semasa haji.` : `Kira-kira <b>${Math.round(hi)} daripada 100</b> jemaah seperti anda jatuh sakit teruk semasa haji.`;
+  const freq = hi<1 ? `Kurang daripada <b>1 daripada 100</b> jemaah seperti anda perlu dimasukkan ke wad atau hospital semasa haji.` : `Kira-kira <b>${Math.round(hi)} daripada 100</b> jemaah seperti anda perlu dimasukkan ke wad atau hospital semasa haji.`;
   rc.innerHTML = `<p class="lbl" style="margin-bottom:4px">Risiko kejadian kesihatan serius semasa haji</p>${GAUGE}
     <div class="tierword" style="color:var(--${T.k})">${MSG.w}</div>
     <p class="tmean">${freq} Bagi jemaah biasa, kira-kira <b>2 daripada 100</b>.</p>
