@@ -797,10 +797,12 @@ function renderResult(rr,g){
   const hi=rr[1], t=tierOf(hi), T=TIERS[t], times=hi/COHORT;
   const cmp = times>=1.15 ? `Lebih kurang ${times.toFixed(1)} kali purata jemaah (${COHORT}%)` : times<=0.85 ? `Lebih rendah daripada purata jemaah (${COHORT}%)` : `Hampir sama dengan purata jemaah (${COHORT}%)`;
   const MSG=[{w:"RISIKO RENDAH",m:"Kebanyakan jemaah seperti anda menunaikan haji tanpa masalah kesihatan yang serius.",a:"Teruskan persediaan dan jaga kesihatan anda."},
-    {w:"RISIKO SEDERHANA",m:"Risiko anda sama seperti kebanyakan jemaah haji.",a:"Kawal penyakit anda dan ikut nasihat di bawah."},
-    {w:"RISIKO TINGGI",m:"Anda lebih mudah jatuh sakit teruk semasa haji, sehingga mungkin perlu masuk wad, berbanding kebanyakan jemaah lain.",a:"Jumpa doktor sekurang-kurangnya 3 bulan sebelum berangkat."}][t];
+    {w:"RISIKO SEDERHANA",m:"Risiko anda hampir sama seperti kebanyakan jemaah haji.",a:"Kawal penyakit anda dan ikut nasihat di bawah."},
+    {w:"RISIKO TINGGI",m:"Maknanya kebanyakan jemaah seperti anda selamat, tetapi peluang anda lebih tinggi, jadi anda perlu lebih bersedia.",a:"Jumpa doktor sekurang-kurangnya 3 bulan sebelum berangkat."}][t];
+  const freq = hi<1 ? `Kurang daripada <b>1 daripada 100</b> jemaah seperti anda jatuh sakit teruk semasa haji.` : `Kira-kira <b>${Math.round(hi)} daripada 100</b> jemaah seperti anda jatuh sakit teruk semasa haji.`;
   rc.innerHTML = `<p class="lbl" style="margin-bottom:4px">Risiko kejadian kesihatan serius semasa haji</p>${GAUGE}
     <div class="tierword" style="color:var(--${T.k})">${MSG.w}</div>
+    <p class="tmean">${freq} Bagi jemaah biasa, kira-kira <b>2 daripada 100</b>.</p>
     <p class="tmean">${MSG.m}</p>
     <div class="todo ${T.k}"><b>Apa perlu buat:</b> ${MSG.a}</div>
     ${rr[0]!==rr[1] ? `<p class="tmean" style="font-size:.85rem;margin-top:10px">Buat ujian HbA1c untuk mendapat keputusan yang lebih tepat.</p>` : ""}
