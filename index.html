@@ -179,14 +179,29 @@ select{width:100%;font-size:1rem;font-weight:600;padding:14px;border-radius:14px
   .hero.photo .brand{font-size:3rem}
   #p1 .tiles{grid-template-columns:repeat(3,1fr)}
   #p2 .tiles.wide{grid-template-columns:1fr 1fr}
-  #p3{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);grid-template-rows:auto auto 1fr;gap:18px;align-items:start}
-  #p3 > #resultCard{grid-column:1;grid-row:1} #p3 > #alerts{grid-column:1;grid-row:2}
-  #p3 > #advCard{grid-column:2;grid-row:1 / span 3}
-  #p3 > .ayah{grid-column:1 / -1;grid-row:4}
-  #p3 > .foot{grid-column:1 / -1;grid-row:5}
+  #p3{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);grid-template-rows:auto 1fr;gap:18px;align-items:start}
+  #p3 > #resultCard{grid-column:1;grid-row:1 / span 2}
+  #p3 > #alerts{grid-column:2;grid-row:1}
+  #p3 > #advCard{grid-column:2;grid-row:2}
+  #p3 > .ayah{grid-column:1 / -1;grid-row:3}
+  #p3 > .foot{grid-column:1 / -1;grid-row:4}
+  #p3:has(#resultCard[hidden]) > #alerts,#p3:has(#resultCard[hidden]) > #advCard{grid-column:1 / -1}
+  /* photo banner: keep near the photo's own size so it stays sharp */
+  .hero.photo{max-width:880px;margin:16px auto 0;border-radius:28px}
+  /* bottom bar floats as a rounded panel the width of the content */
+  body{padding-bottom:124px}
+  body .bar{left:50%;right:auto;bottom:16px;transform:translateX(-50%);width:min(calc(var(--maxw) + 24px), calc(100vw - 32px));border-radius:22px;box-shadow:0 12px 32px rgba(15,34,64,.18)}
+  body .bar .wrap{max-width:none;padding-left:16px;padding-right:16px}
   body .chat{left:auto;right:24px;bottom:24px;width:460px;height:min(80vh,760px);border-radius:24px}
-  body .fab{right:max(16px, calc((100vw - var(--maxw))/2 + 16px))}
+  body .fab{right:max(16px, calc((100vw - var(--maxw))/2 + 16px));bottom:104px}
 }
+@media (min-width:1240px){
+  /* wide screens: help button sits in the margin beside the bar, clear of the content */
+  body .fab{right:calc((100vw - var(--maxw))/2 - 76px);bottom:26px}
+}
+.tg{color:var(--brand);font-weight:700}
+.fab{transition:opacity .25s,transform .25s}
+.fab.away{opacity:0;transform:translateY(16px);pointer-events:none}
 .hero{position:relative;overflow:hidden}
 .hero .wrap{position:relative;z-index:1}
 .hero-bg{position:absolute;inset:0;display:none}
@@ -309,7 +324,7 @@ select{width:100%;font-size:1rem;font-weight:600;padding:14px;border-radius:14px
       <h2>Apa yang anda akan dapat</h2>
       <p class="sub">Tiga langkah ringkas, kira-kira 2 minit.</p>
       <ul class="feat">
-        <li><span aria-hidden="true">📊</span><div><b>Anggaran risiko anda</b>Peratus risiko dan tahap rendah, sederhana atau tinggi.</div></li>
+        <li><span aria-hidden="true">📊</span><div><b>Anggaran risiko anda</b>Tahap risiko rendah, sederhana atau tinggi, dan maksudnya untuk anda.</div></li>
         <li><span aria-hidden="true">📋</span><div><b>Semakan saringan</b>Keadaan yang biasanya tidak diluluskan atau perlu penilaian lanjut.</div></li>
         <li><span aria-hidden="true">💡</span><div><b>Nasihat persediaan</b>Langkah khusus mengikut penyakit anda.</div></li>
         <li><span aria-hidden="true">❓</span><div><b>Soalan lazim dan tips</b>Jawapan kepada soalan biasa, termasuk tips senaman dan cuaca panas.</div></li>
@@ -812,7 +827,7 @@ function renderResult(rr,g){
   requestAnimationFrame(()=>{ const n=$("needle"); if(n) n.style.transform=`rotate(${angleOf(hi)}deg)`; });
   const PRI={"⚠️":0,"📉":1,"🫀":2,"🫁":2,"🛡️":2,"🍚":2,"🥩":2,"🩺":3,"🫘":3,"🎗️":3,"🩸":4,"🧠":4,"🦽":4,"💉":4,"✅":5,"⚖️":5,"👤":5,"🚶":5,"🍔":6,"🦶":6,"🦴":6,"🦋":6,"☀️":9};
   const groups = advice().map((g,k)=>({...g,k})).sort((a,b)=>((PRI[a.e]??7)-(PRI[b.e]??7)) || a.k-b.k);
-  const card = s=>`<details class="advg"><summary><span class="ae" aria-hidden="true">${s.e}</span><span class="as"><b>${s.h}</b><small>${s.t.length?"🎯 "+s.t[0]:s.items[0]}</small></span></summary><div class="ab">${s.t.length?`<div class="tgt"><b>🎯 Sasaran</b><ul>${s.t.map(x=>`<li>${x}</li>`).join("")}</ul></div>`:""}<ul class="adv">${s.items.map(x=>`<li>${x}</li>`).join("")}</ul>${s.src?`<p class="src">Rujukan: ${s.src}</p>`:""}</div></details>`;
+  const card = s=>`<details class="advg"><summary><span class="ae" aria-hidden="true">${s.e}</span><span class="as"><b>${s.h}</b><small>${s.t.length?`<span class="tg">Sasaran:</span> `+s.t[0]:s.items[0]}</small></span></summary><div class="ab">${s.t.length?`<div class="tgt"><b>Sasaran</b><ul>${s.t.map(x=>`<li>${x}</li>`).join("")}</ul></div>`:""}<ul class="adv">${s.items.map(x=>`<li>${x}</li>`).join("")}</ul>${s.src?`<p class="src">Rujukan: ${s.src}</p>`:""}</div></details>`;
   const top=groups.slice(0,3), rest=groups.slice(3);
   $("advCard").innerHTML = `<h2>3 langkah utama anda</h2><p class="sub">Tekan setiap tajuk untuk maklumat lanjut.</p>${top.map(card).join("")}
     ${rest.length?`<details class="more"><summary>Lihat semua nasihat (${rest.length} lagi)</summary>${rest.map(card).join("")}</details>`:""}
@@ -915,6 +930,9 @@ $("faqSearch").addEventListener("input", renderFaq);
 function openFaq(){ $("faq").hidden=false; $("faqFab").hidden=true; renderFaq(); }
 function closeFaq(){ $("faq").hidden=true; $("faqFab").hidden=false; }
 $("faqFab").addEventListener("click", openFaq);
+/* phone: hide the help button while scrolling down (reading), show it again when scrolling up or at the end */
+(()=>{ let y=scrollY; addEventListener("scroll",()=>{ const f=$("faqFab"), n=scrollY, end=innerHeight+n>=document.documentElement.scrollHeight-40;
+  if(innerWidth>=900 || end || n<120 || n<y-4) f.classList.remove("away"); else if(n>y+4) f.classList.add("away"); y=n; },{passive:true}); })();
 $("faqClose").addEventListener("click", closeFaq);
 document.addEventListener("keydown", e=>{ if(e.key==="Escape" && !$("faq").hidden) closeFaq(); });
 </script>
