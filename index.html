@@ -806,7 +806,6 @@ function renderResult(rr,g){
   rc.innerHTML = `<p class="lbl" style="margin-bottom:4px">Risiko kejadian kesihatan serius semasa haji</p>${GAUGE}
     <div class="tierword" style="color:var(--${T.k})">${MSG.w}</div>
     <p class="tmean">${freq}</p>
-    <p class="tmean">${MSG.m}</p>
     <div class="todo ${T.k}"><b>Apa perlu buat:</b> ${MSG.a}</div>
     ${rr[0]!==rr[1] ? `<p class="tmean" style="font-size:.85rem;margin-top:10px">Buat ujian HbA1c untuk mendapat keputusan yang lebih tepat.</p>` : ""}
     <details class="doc"><summary>Butiran untuk doktor</summary><p>Anggaran kebarangkalian kejadian kesihatan serius (kematian, kemasukan wad fasiliti kesihatan haji, atau kemasukan hospital Arab Saudi): <b>${rangeTxt(rr)}</b>${rr[0]!==rr[1]?" (julat kerana HbA1c tidak diketahui)":""}. Purata kohort: ${COHORT}%. ${cmp}. Tahap: rendah &lt;1%, sederhana 1% hingga &lt;3%, tinggi ≥3%. Model HAJJFIT (elastic net; AUC 0.74).</p></details>`;
