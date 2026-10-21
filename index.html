@@ -172,21 +172,20 @@ select{width:100%;font-size:1rem;font-weight:600;padding:14px;border-radius:14px
   .gauge{max-width:220px}
 }
 @media (min-width:900px){
-  .wrap{max-width:1000px}
+  body{--maxw:760px}
+  body.wide{--maxw:1040px}
+  .wrap{max-width:var(--maxw)}
   .hero.photo{min-height:440px}
   .hero.photo .brand{font-size:3rem}
-  #pi{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:stretch}
-  #pi > .disc{grid-column:1 / -1}
-  #p0,#p1,#p2{max-width:760px;margin-left:auto;margin-right:auto}
   #p1 .tiles{grid-template-columns:repeat(3,1fr)}
   #p2 .tiles.wide{grid-template-columns:1fr 1fr}
-  #p3{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);grid-template-rows:auto auto 1fr;gap:18px;align-items:start}
+  #p3{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);grid-template-rows:auto auto 1fr;gap:18px;align-items:start}
   #p3 > #resultCard{grid-column:1;grid-row:1} #p3 > #alerts{grid-column:1;grid-row:2}
   #p3 > #advCard{grid-column:2;grid-row:1 / span 3}
   #p3 > .ayah{grid-column:1 / -1;grid-row:4}
   #p3 > .foot{grid-column:1 / -1;grid-row:5}
   body .chat{left:auto;right:24px;bottom:24px;width:460px;height:min(80vh,760px);border-radius:24px}
-  body .fab{right:calc((100vw - 1000px)/2 + 16px)}
+  body .fab{right:max(16px, calc((100vw - var(--maxw))/2 + 16px))}
 }
 .hero{position:relative;overflow:hidden}
 .hero .wrap{position:relative;z-index:1}
@@ -533,6 +532,7 @@ function go(i){
   [0,1,2,3].forEach(j=>$("p"+j).hidden = j!==i);
   $("pi").hidden = i!==-1;
   document.querySelector(".hero").classList.toggle("photo", i===-1);
+  document.body.classList.toggle("wide", i===3);
   document.querySelector(".prog").style.display = i===-1 ? "none" : "";
   document.querySelector(".bar .risk").style.visibility = i===3 ? "" : "hidden";
   $("progTxt").textContent = i===3 ? "Keputusan anda" : `Langkah ${i+1} daripada 4`;
@@ -805,7 +805,7 @@ function renderResult(rr,g){
   const freq = hi<1 ? `Kurang daripada <b>1 daripada 100</b> jemaah seperti anda perlu dimasukkan ke wad atau hospital semasa haji.` : `Kira-kira <b>${Math.round(hi)} daripada 100</b> jemaah seperti anda perlu dimasukkan ke wad atau hospital semasa haji.`;
   rc.innerHTML = `<p class="lbl" style="margin-bottom:4px">Risiko kejadian kesihatan serius semasa haji</p>${GAUGE}
     <div class="tierword" style="color:var(--${T.k})">${MSG.w}</div>
-    <p class="tmean">${freq} Bagi jemaah biasa, kira-kira <b>2 daripada 100</b>.</p>
+    <p class="tmean">${freq}</p>
     <p class="tmean">${MSG.m}</p>
     <div class="todo ${T.k}"><b>Apa perlu buat:</b> ${MSG.a}</div>
     ${rr[0]!==rr[1] ? `<p class="tmean" style="font-size:.85rem;margin-top:10px">Buat ujian HbA1c untuk mendapat keputusan yang lebih tepat.</p>` : ""}
