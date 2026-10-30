@@ -538,7 +538,7 @@ function validate(st){
   }
   if(st===1 && !S.hbUnk && !(S.hb>=5 && S.hb<=20)){ miss.push("nilai Hb, atau tandakan \u201cSaya tidak tahu\u201d"); mark.push($("hb").parentNode); }
   if(st===1 && S.conds.dm && !S.hba1c){ miss.push("bacaan HbA1c (pilih \u201cSaya tidak tahu\u201d jika tiada)"); mark.push($("hba1c")); }
-  if(st===1 && !S.conds.hpt && !S.bp){ miss.push("bacaan tekanan darah (pilih \u201cSaya tidak tahu\u201d jika tiada)"); mark.push($("bp")); }
+  if(st===1 && !S.bp){ miss.push("bacaan tekanan darah (pilih \u201cSaya tidak tahu\u201d jika tiada)"); mark.push($("bp")); }
   if(st===1 && S.rbs!=null && !(S.rbs>=1 && S.rbs<=35)){ miss.push("bacaan gula jari (1 hingga 35 mmol/L), atau biarkan kosong"); mark.push($("rbs").parentNode); }
   if(st===2 && !S.mrs){ miss.push("kemampuan harian anda"); mark.push($("mrsList")); }
   const e=$("err"+st);
@@ -684,6 +684,10 @@ function advice(){
     `Bacaan gula jari anda ${S.rbs} mmol/L, iaitu rendah.`,
     "Jika menggeletar, berpeluh atau pening: ambil 15 g gula segera, iaitu 3 sudu teh gula dalam air atau setengah gelas (150 ml) jus, dan semak semula selepas 15 minit.",
     "Maklumkan kepada doktor, terutama jika anda guna insulin atau ubat kencing manis, kerana dos mungkin perlu diubah sebelum berangkat."], SRC.dm);
+  if(c.hpt && S.bp==="ge") g("🩺", "Tekanan darah belum terkawal", ["Tekanan darah bawah 140/90 mmHg"], [
+    "Bacaan terkini anda 140/90 mmHg atau lebih. Jumpa doktor untuk semak ubat darah tinggi sebelum berangkat.",
+    "Ambil ubat setiap hari pada waktu yang sama, dan jangan berhenti makan ubat tanpa nasihat doktor.",
+    "Ukur semula tekanan darah selepas rawatan diubah, dan bawa catatan bacaan semasa saringan."], SRC.hpt);
   if(c.hpt) g("🩺", "Darah tinggi", [bpT, "Garam bawah 5 g sehari, iaitu lebih kurang 1 sudu teh untuk sehari"], [
     "Ambil ubat setiap hari, walaupun rasa sihat.",
     "Kurangkan garam: elak ikan masin, budu, cencaluk, keropok, mi segera, kicap dan sos yang banyak, serta makanan bertin.",
@@ -836,7 +840,6 @@ function sync(){
   bc.className = "chip" + (bmi ? (bmi<18.5||bmi>=27.5 ? " hi" : bmi>=23 ? " mid" : " ok") : "");
   $("hb").disabled = !!S.hbUnk;
   $("dmBox").hidden = !S.conds.dm;
-  $("bpBox").hidden = !!S.conds.hpt;
   const rr = riskRange(), gg = guideline();
   $("barVal").textContent = gg.bad.length ? "Tidak layak" : rr ? TIERS[tierOf(rr[1])].short : "Isi profil";
   $("barVal").style.color = gg.bad.length ? "var(--ink)" : rr ? `var(--${TIERS[tierOf(rr[1])].k})` : "";
@@ -879,7 +882,7 @@ function renderResult(rr,g){
   const mr = MRS.find(m=>m.v===S.mrs);
   const d = new Date().toLocaleDateString("ms-MY",{day:"numeric",month:"long",year:"numeric"});
   $("printSum").innerHTML = `<h2 style="margin:0 0 4px">HAJJFIT · Ringkasan semakan kesihatan haji</h2><p class="sub" style="margin:0 0 10px">Tarikh: ${d}</p>
-    <p style="margin:0;font-size:.9rem;line-height:1.7">Jantina: ${S.sex==="M"?"Lelaki":"Perempuan"} · Umur: ${S.age} tahun · Tinggi ${S.ht} cm · Berat ${S.wt} kg · BMI ${bmiOf().toFixed(1)} · Hb: ${S.hbUnk||S.hb==null?"tidak diketahui":S.hb+" g/dL"}<br>Penyakit: ${conds}<br>HbA1c: ${a1c} · Tekanan darah: ${S.conds.hpt?"darah tinggi (diagnosis)":((BP.find(b=>b[0]===S.bp)||[,"–"])[1])} · Gula jari: ${S.rbs!=null?S.rbs+" mmol/L":"–"}<br>Kemampuan harian: ${mr?mr.t:"–"}</p>`;
+    <p style="margin:0;font-size:.9rem;line-height:1.7">Jantina: ${S.sex==="M"?"Lelaki":"Perempuan"} · Umur: ${S.age} tahun · Tinggi ${S.ht} cm · Berat ${S.wt} kg · BMI ${bmiOf().toFixed(1)} · Hb: ${S.hbUnk||S.hb==null?"tidak diketahui":S.hb+" g/dL"}<br>Penyakit: ${conds}<br>HbA1c: ${a1c} · Tekanan darah: ${(S.conds.hpt?"darah tinggi (diagnosis); bacaan ":"")+((BP.find(b=>b[0]===S.bp)||[,"–"])[1])} · Gula jari: ${S.rbs!=null?S.rbs+" mmol/L":"–"}<br>Kemampuan harian: ${mr?mr.t:"–"}</p>`;
 }
 window.addEventListener("beforeprint",()=>{ document.querySelectorAll("#p3 details").forEach(d=>{ d.dataset.wasOpen=d.open?"1":""; d.open=true; }); });
 window.addEventListener("afterprint",()=>{ document.querySelectorAll("#p3 details").forEach(d=>{ d.open=!!d.dataset.wasOpen; }); });
