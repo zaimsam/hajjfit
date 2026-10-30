@@ -331,7 +331,7 @@ select{width:100%;font-size:1rem;font-weight:600;padding:14px;border-radius:14px
       </ul>
     </div>
     <p class="disc" style="text-align:center"><b>Alat ini bukan penentu kelayakan haji.</b></p>
-    <p class="foot">Dibangunkan oleh Jabatan Perubatan Masyarakat, Pusat Pengajian Sains Perubatan, Universiti Sains Malaysia, sebagai sebahagian daripada kajian DrPH.<br>Versi 1.0 · Oktober 2026 · Ikon: Twemoji (CC-BY 4.0) · Foto: Wikimedia Commons (CC0)</p>
+    <p class="foot">Dibangunkan oleh Jabatan Perubatan Masyarakat, Pusat Pengajian Sains Perubatan, Universiti Sains Malaysia, sebagai sebahagian daripada kajian DrPH.<br>Versi 1.1 · Oktober 2026 · Ikon: Twemoji (CC-BY 4.0) · Foto: Wikimedia Commons (CC0)</p>
   </section>
 
   <section class="panel" id="p0">
@@ -365,6 +365,16 @@ select{width:100%;font-size:1rem;font-weight:600;padding:14px;border-radius:14px
       <h2>Bacaan HbA1c terkini</h2>
       <p class="sub">Ujian gula 3 bulan, dalam tempoh 3 bulan lepas.</p>
       <select id="hba1c" aria-label="HbA1c"></select>
+    </div>
+    <div class="card" id="bpBox">
+      <h2>Bacaan tekanan darah terkini</h2>
+      <p class="sub">Bacaan di klinik atau di rumah dalam tempoh 3 bulan lepas.</p>
+      <select id="bp" aria-label="Tekanan darah"></select>
+    </div>
+    <div class="card">
+      <h2>Bacaan gula jari (glucometer)</h2>
+      <p class="sub">Tidak wajib. Isi jika ada bacaan gula rawak terkini. Bacaan ini tidak mengubah anggaran risiko, hanya untuk nasihat.</p>
+      <div class="stepper"><button type="button" data-step="rbs" data-d="-0.1" aria-label="Kurang bacaan gula">−</button><input type="number" id="rbs" min="1" max="35" step="0.1" inputmode="decimal" aria-label="Bacaan gula rawak"><span class="unit">mmol/L</span><button type="button" data-step="rbs" data-d="0.1" aria-label="Tambah bacaan gula">+</button></div>
       <p class="err" id="err1" hidden role="alert"></p>
     </div>
   </section>
@@ -396,7 +406,7 @@ select{width:100%;font-size:1rem;font-weight:600;padding:14px;border-radius:14px
       <p class="tr">“Ya Allah, permudahkanlah dan jangan Engkau sukarkan.”</p>
       <p class="ref" style="margin-top:10px">SEMOGA ALLAH MEMUDAHKAN SEGALA URUSAN HAJI ANDA DAN MENERIMANYA SEBAGAI HAJI YANG MABRUR</p>
     </div>
-    <p class="foot">Dibangunkan oleh Jabatan Perubatan Masyarakat, Pusat Pengajian Sains Perubatan, Universiti Sains Malaysia, sebagai sebahagian daripada kajian DrPH.<br>Versi 1.0 · Oktober 2026 · Ikon: Twemoji (CC-BY 4.0) · Foto: Wikimedia Commons (CC0)</p>
+    <p class="foot">Dibangunkan oleh Jabatan Perubatan Masyarakat, Pusat Pengajian Sains Perubatan, Universiti Sains Malaysia, sebagai sebahagian daripada kajian DrPH.<br>Versi 1.1 · Oktober 2026 · Ikon: Twemoji (CC-BY 4.0) · Foto: Wikimedia Commons (CC0)</p>
   </section>
 </main>
 
@@ -417,16 +427,18 @@ select{width:100%;font-size:1rem;font-weight:600;padding:14px;border-radius:14px
 </div></section>
 
 <script>
-/* Elastic net, HAJJFIT Phase 2 v8 (10-fold CV AUC 0.740; calibration slope 1.01). 32,084 pilgrims, Hajj 1447H/2026. */
-const B = {int:-6.2039, AGE:0.0494, MALE:0.3748, BMI:0.0040, BMI_UNDER_18_5:1.0300, HAEMOGLOBIN:-0.1089,
-  DIABETES:0.2705, DM_HBA1C_GT8:0.3163, HYPERTENSION:0.1446, DYSLIPIDAEMIA:0.0733, ASCVD:0.3820, CKD:0.3580,
-  ASTHMA:0.7959, COPD_OTHER_LUNG:0.8754, NONISCH_HEART:0.6907, CANCER:0.6014, ARTHRITIS:0.3778, GOUT:0.1538,
-  THYROID:0.5021, SLE:1.5754, NEUROPSYCH:0.3225, MRS:0.2492};
+/* Elastic net (lambda.min), HAJJFIT Phase 2 v9 (10-fold CV AUC 0.740; calibration slope 1.01). 32,084 pilgrims, Hajj 1447H/2026.
+   HbA1c threshold 8.5%. HbA1c 'unknown' coefficient (-0.34) deliberately NOT used: unknown HbA1c is shown as a range (<=8.5% vs >8.5%).
+   Smoking coefficient = 0 (dropped). HYPERTENSION = doctor-diagnosed OR latest BP >= 140/90 mmHg (as in the model). */
+const B = {int:-6.1854, AGE:0.0489, MALE:0.3756, BMI:0.0034, BMI_UNDER_18_5:1.0254, HAEMOGLOBIN:-0.1089,
+  DIABETES:0.2826, DM_HBA1C_GT85:0.4093, HYPERTENSION:0.1821, DYSLIPIDAEMIA:0.0683, ASCVD:0.3739, CKD:0.3606,
+  ASTHMA:0.8037, COPD_OTHER_LUNG:0.8663, NONISCH_HEART:0.6934, CANCER:0.6025, ARTHRITIS:0.3901, GOUT:0.1465,
+  THYROID:0.4996, SLE:1.5780, NEUROPSYCH:0.3055, MRS:0.2503};
 const HB_MED = {F:12.9, M:14.6};
 const COHORT = 1.8;
 const TIERS = [
-  {k:"ok", name:"Risiko rendah", short:"Rendah", rng:"Bawah 1%", rate:"0.6%", share:"38%"},
-  {k:"mid", name:"Risiko sederhana", short:"Sederhana", rng:"1% – 3%", rate:"1.6%", share:"48%"},
+  {k:"ok", name:"Risiko rendah", short:"Rendah", rng:"Bawah 1%", rate:"0.6%", share:"39%"},
+  {k:"mid", name:"Risiko sederhana", short:"Sederhana", rng:"1% – 3%", rate:"1.6%", share:"47%"},
   {k:"hi", name:"Risiko tinggi", short:"Tinggi", rng:"3% ke atas", rate:"5.7%", share:"14%"}];
 
 /* simple line icons */
@@ -466,7 +478,8 @@ const CONDS = [
   {k:"thyroid", x:"THYROID", t:"Penyakit tiroid", i:"🦋"},
   {k:"sle", x:"SLE", t:"SLE (lupus)", i:"🛡️"},
   {k:"neuro", x:"NEUROPSYCH", t:"Mental atau saraf", s:"Parkinson, nyanyuk, sawan, kecederaan kepala", i:"🧠"}];
-const HBA1C = [["le8","8.0% atau kurang"],["8to85","8.1% hingga 8.4%"],["85to10","8.5% hingga 10.0%"],["gt10","Lebih daripada 10.0%"],["unk","Saya tidak tahu"]];
+const HBA1C = [["le85","8.5% atau kurang"],["85to10","8.6% hingga 10.0%"],["gt10","Lebih daripada 10.0%"],["unk","Saya tidak tahu"]];
+const BP = [["lt","Bawah 140/90 mmHg"],["ge","140/90 mmHg atau lebih (atas 140 atau bawah 90 ke atas)"],["unk","Saya tidak tahu / tiada bacaan"]];
 const MRS = [
   {v:"0", t:"Sihat sepenuhnya", s:"Boleh bekerja, berjalan jauh dan membuat semua aktiviti tanpa sebarang masalah.", i:"🏃"},
   {v:"1", t:"Ada simptom ringan", s:"Ada sedikit masalah seperti sakit sendi atau cepat penat, tetapi masih boleh membuat semua aktiviti seperti biasa.", i:"🚶"},
@@ -484,20 +497,22 @@ const FLAGS = [
 const $ = id => document.getElementById(id);
 const S = {};
 let step = 0;
-const EXAMPLE = {age:63, sex:"F", ht:152, wt:58, hb:null, hbUnk:true, conds:{dm:true, hpt:true, asthma:true}, hba1c:"8to85", mrs:"1", flags:{}};
-const BLANK = {age:null, sex:null, ht:null, wt:null, hb:null, hbUnk:false, conds:{}, hba1c:"", mrs:"", flags:{}};
-const DEF = {age:55, ht:158, wt:62, hb:13};
+const EXAMPLE = {age:63, sex:"F", ht:152, wt:58, hb:null, hbUnk:true, conds:{dm:true, hpt:true, asthma:true}, hba1c:"85to10", bp:"", rbs:null, mrs:"1", flags:{}};
+const BLANK = {age:null, sex:null, ht:null, wt:null, hb:null, hbUnk:false, conds:{}, hba1c:"", bp:"", rbs:null, mrs:"", flags:{}};
+const DEF = {age:55, ht:158, wt:62, hb:13, rbs:7.0};
 
 function buildUI(){
   $("condList").innerHTML = CONDS.map(c=>`<label class="tile"><input type="checkbox" id="c_${c.k}"><span class="ic" aria-hidden="true">${c.i}</span><span>${c.t}${c.s?`<small>${c.s}</small>`:""}</span><span class="tick">✓</span></label>`).join("");
   $("hba1c").innerHTML = `<option value="">Pilih bacaan</option>` + HBA1C.map(([v,t])=>`<option value="${v}">${t}</option>`).join("");
+  $("bp").innerHTML = `<option value="">Pilih bacaan</option>` + BP.map(([v,t])=>`<option value="${v}">${t}</option>`).join("");
   $("mrsList").innerHTML = MRS.map(m=>`<label class="tile"><input type="radio" name="mrs" id="m_${m.v}" value="${m.v}"><span class="ic" aria-hidden="true">${m.i}</span><span>${m.t}<small>${m.s}</small></span><span class="tick">✓</span></label>`).join("");
   $("flagList").innerHTML = FLAGS.map(f=>`<label class="tile"><input type="checkbox" id="f_${f.k}"><span class="ic" aria-hidden="true">${f.i}</span><span>${f.t}</span><span class="tick">✓</span></label>`).join("");
   CONDS.forEach(c=>$("c_"+c.k).addEventListener("change",e=>{S.conds[c.k]=e.target.checked; sync();}));
   FLAGS.forEach(f=>$("f_"+f.k).addEventListener("change",e=>{S.flags[f.k]=e.target.checked; sync();}));
   MRS.forEach(m=>$("m_"+m.v).addEventListener("change",()=>{S.mrs=m.v; sync();}));
   $("hba1c").addEventListener("change",e=>{S.hba1c=e.target.value; sync();});
-  ["age","ht","wt","hb"].forEach(k=>$(k).addEventListener("input",e=>{S[k]=e.target.value===""?null:+e.target.value; sync();}));
+  $("bp").addEventListener("change",e=>{S.bp=e.target.value; sync();});
+  ["age","ht","wt","hb","rbs"].forEach(k=>$(k).addEventListener("input",e=>{S[k]=e.target.value===""?null:+e.target.value; sync();}));
   document.querySelectorAll("[data-step]").forEach(b=>b.addEventListener("click",()=>{
     const k=b.dataset.step, d=+b.dataset.d, el=$(k);
     let v = (S[k]==null ? DEF[k] : S[k]) + (S[k]==null ? 0 : d);
@@ -525,6 +540,8 @@ function validate(st){
     if(!S.hbUnk && !(S.hb>=5 && S.hb<=20)){ miss.push("nilai Hb, atau tandakan \u201cSaya tidak tahu\u201d"); mark.push($("hb").parentNode); }
   }
   if(st===1 && S.conds.dm && !S.hba1c){ miss.push("bacaan HbA1c (pilih \u201cSaya tidak tahu\u201d jika tiada)"); mark.push($("hba1c")); }
+  if(st===1 && !S.conds.hpt && !S.bp){ miss.push("bacaan tekanan darah (pilih \u201cSaya tidak tahu\u201d jika tiada)"); mark.push($("bp")); }
+  if(st===1 && S.rbs!=null && !(S.rbs>=1 && S.rbs<=35)){ miss.push("bacaan gula jari (1 hingga 35 mmol/L), atau biarkan kosong"); mark.push($("rbs").parentNode); }
   if(st===2 && !S.mrs){ miss.push("kemampuan harian anda"); mark.push($("mrsList")); }
   const e=$("err"+st);
   if(!miss.length){ e.hidden=true; return true; }
@@ -535,11 +552,11 @@ function validate(st){
 }
 function load(o){
   Object.assign(S, JSON.parse(JSON.stringify(o)));
-  ["age","ht","wt","hb"].forEach(k=>$(k).value = S[k]??"");
+  ["age","ht","wt","hb","rbs"].forEach(k=>$(k).value = S[k]??"");
   $("hbUnk").checked = !!S.hbUnk;
   CONDS.forEach(c=>$("c_"+c.k).checked=!!S.conds[c.k]);
   FLAGS.forEach(f=>$("f_"+f.k).checked=!!S.flags[f.k]);
-  $("hba1c").value = S.hba1c||""; MRS.forEach(m=>$("m_"+m.v).checked = S.mrs===m.v);
+  $("hba1c").value = S.hba1c||""; $("bp").value = S.bp||""; MRS.forEach(m=>$("m_"+m.v).checked = S.mrs===m.v);
   sync();
 }
 function go(i){
@@ -559,11 +576,12 @@ function go(i){
 const bmiOf = () => (S.ht && S.wt) ? S.wt/((S.ht/100)**2) : null;
 const ready = () => S.age && S.sex && S.ht && S.wt;
 
-function lp(gt8){
+function lp(gt85){
   const bmi = bmiOf(), hb = (S.hbUnk||S.hb==null) ? HB_MED[S.sex] : S.hb, c = S.conds;
   const x = {AGE:S.age, MALE:S.sex==="M"?1:0, BMI:bmi, BMI_UNDER_18_5:bmi<18.5?1:0, HAEMOGLOBIN:hb,
-    DIABETES:c.dm?1:0, DM_HBA1C_GT8:(c.dm&&gt8)?1:0, MRS:Math.min(+S.mrs||0,3)};
+    DIABETES:c.dm?1:0, DM_HBA1C_GT85:(c.dm&&gt85)?1:0, MRS:Math.min(+S.mrs||0,3)};
   CONDS.forEach(k=>{ if(k.x!=="DIABETES") x[k.x] = c[k.k]?1:0; });
+  x.HYPERTENSION = (c.hpt || S.bp==="ge") ? 1 : 0;
   let z = B.int; for(const k in x) z += (B[k]||0)*x[k];
   return 100/(1+Math.exp(-z));
 }
@@ -571,8 +589,8 @@ function riskRange(){
   if(!ready()) return null;
   const c = S.conds;
   if(c.dm && (S.hba1c==="unk" || !S.hba1c)) return [lp(false), lp(true)];
-  const gt8 = c.dm && ["8to85","85to10","gt10"].includes(S.hba1c);
-  const r = lp(gt8); return [r, r];
+  const gt85 = c.dm && ["85to10","gt10"].includes(S.hba1c);
+  const r = lp(gt85); return [r, r];
 }
 const tierOf = r => r<1 ? 0 : r<3 ? 1 : 2;
 const fmt = r => r<10 ? r.toFixed(1) : r.toFixed(0);
@@ -584,7 +602,10 @@ function guideline(){
   if(bmi!==null && bmi>=37.5) bad.push(`BMI ${bmi.toFixed(1)} (37.5 atau lebih)`);
   if(S.mrs==="4") bad.push("Tidak boleh berjalan tanpa dipimpin orang, atau perlu bantuan untuk mandi dan ke tandas");
   if(c.dm && S.hba1c==="gt10"){ bad.push("HbA1c lebih daripada 10%"); temp=true; }
-  if(c.dm && S.hba1c==="85to10") warn.push("HbA1c 8.5% hingga 10%: perlu dinilai oleh pakar");
+  if(c.dm && S.hba1c==="85to10") warn.push("HbA1c 8.6% hingga 10%: perlu dinilai oleh pakar");
+  if(!c.hpt && S.bp==="ge") warn.push("Tekanan darah 140/90 mmHg atau lebih tanpa diagnosis darah tinggi: perlu disahkan di klinik");
+  if(S.rbs!=null && !c.dm && S.rbs>=11.1) warn.push(`Gula jari ${S.rbs} mmol/L (11.1 atau lebih) tanpa diagnosis kencing manis: perlu disahkan di klinik`);
+  if(S.rbs!=null && S.rbs<4.0) warn.push(`Gula jari ${S.rbs} mmol/L (bawah 4.0): kemungkinan gula rendah, maklumkan kepada doktor`);
   if(c.dm && (S.hba1c==="unk" || !S.hba1c)) warn.push("HbA1c belum diketahui: buat ujian HbA1c sebelum saringan");
   if(S.mrs==="3") warn.push("Perlu bantuan orang untuk sesetengah urusan: perlu ujian kekuatan kaki (30-Second Sit To Stand)");
   if(!S.hbUnk && S.hb!=null && S.hb<10) warn.push(`Hb ${S.hb} g/dL (bawah 10): perlu rawatan anemia sebelum berangkat`);
@@ -617,7 +638,7 @@ function advice(){
     "Utamakan ibadah wajib, dan rehat secukupnya antara ibadah."], "");
 
   if(c.dm){
-    const a1cHigh = ["8to85","85to10","gt10"].includes(S.hba1c), a1cUnk = (S.hba1c==="unk" || !S.hba1c);
+    const a1cHigh = ["85to10","gt10"].includes(S.hba1c), a1cUnk = (S.hba1c==="unk" || !S.hba1c);
     const t = [lessTight ? "HbA1c 7.1% hingga 8.0% (sasaran untuk warga emas atau yang ada beberapa penyakit lain; doktor akan tetapkan)" : "HbA1c bawah 7.0%",
       "Gula puasa atau sebelum makan: 4.4 hingga 7.0 mmol/L", "Gula selepas makan: 4.4 hingga 8.5 mmol/L"];
     if(a1cHigh || a1cUnk) g("📉", a1cUnk ? "Semak dan turunkan HbA1c" : "Cara turunkan HbA1c", t, [
@@ -633,7 +654,7 @@ function advice(){
       "Jika ada alat semak gula, semak dan catat bacaan untuk ditunjukkan kepada doktor.",
       "Ulang ujian HbA1c selepas 3 bulan untuk lihat sama ada sasaran sudah dicapai."], SRC.dm);
     else g("✅", "Kekalkan kawalan gula", t, [
-      "HbA1c anda sudah 8% atau kurang. Teruskan ubat, pemakanan dan senaman.",
+      "HbA1c anda 8.5% atau kurang. Teruskan ubat, pemakanan dan senaman.",
       "Jika HbA1c masih melebihi sasaran di atas, bincang dengan doktor cara menurunkannya lagi.",
       "Ulang HbA1c sebelum saringan jika ujian terakhir lebih 3 bulan lepas."], SRC.dm);
     g("🩸", "Kencing manis semasa haji", ["Gula darah tidak turun bawah 3.9 mmol/L (paras gula rendah)"], [
@@ -644,6 +665,27 @@ function advice(){
       "Jangan berjalan tanpa alas kaki. Periksa kaki setiap malam untuk luka atau lepuh.",
       "Makan pada waktu yang tetap walaupun jadual ibadah padat."], SRC.dm);
   }
+  if(!c.hpt && S.bp==="ge") g("🩺", "Sahkan tekanan darah anda", ["Tekanan darah bawah 140/90 mmHg"], [
+    "Bacaan 140/90 mmHg atau lebih belum tentu darah tinggi. Ulang ukuran di klinik kesihatan, sekurang-kurangnya dua kali pada hari yang berbeza.",
+    "Duduk dan berehat 5 minit sebelum diukur, dan elak kopi atau rokok 30 minit sebelumnya.",
+    "Jika disahkan darah tinggi, doktor akan memulakan rawatan. Mulakan sekarang supaya tekanan darah terkawal sebelum berangkat.",
+    "Garam bawah 5 g sehari, iaitu lebih kurang 1 sudu teh untuk sehari."], SRC.hpt);
+  if(!c.hpt && S.bp==="unk") g("🩺", "Ukur tekanan darah anda", [], [
+    "Ukur tekanan darah di klinik kesihatan atau farmasi sebelum saringan haji.",
+    "Bacaan 140/90 mmHg atau lebih perlu dinilai oleh doktor, kerana darah tinggi yang tidak dikawal menambah risiko semasa haji."], SRC.hpt);
+  if(S.rbs!=null && !c.dm && S.rbs>=7.8) g("🩸", "Sahkan bacaan gula anda", [], [
+    `Bacaan gula jari anda ${S.rbs} mmol/L. Bacaan glucometer sahaja tidak boleh mengesahkan kencing manis.`,
+    "Buat ujian pengesahan di klinik kesihatan (ujian gula berpuasa atau HbA1c) sebelum saringan haji.",
+    ...(S.rbs>=11.1 ? ["Bacaan 11.1 mmol/L atau lebih mungkin menunjukkan kencing manis yang belum dikesan. Jumpa doktor secepat mungkin."] : []),
+    "Bacaan ini tidak digunakan dalam pengiraan risiko anda."], SRC.dm);
+  if(S.rbs!=null && c.dm && S.rbs>=11.1) g("🩸", "Bacaan gula jari anda tinggi", [], [
+    `Bacaan gula jari anda ${S.rbs} mmol/L. Satu bacaan tinggi belum tentu kawalan gula anda teruk, tetapi perlu dipantau.`,
+    "Catat bacaan gula beberapa kali seminggu dan tunjukkan kepada doktor.",
+    "Ujian HbA1c di klinik ialah ukuran kawalan gula yang digunakan semasa saringan haji."], SRC.dm);
+  if(S.rbs!=null && S.rbs<4.0) g("🩸", "Bacaan gula jari anda rendah", ["Gula darah tidak turun bawah 3.9 mmol/L (paras gula rendah)"], [
+    `Bacaan gula jari anda ${S.rbs} mmol/L, iaitu rendah.`,
+    "Jika menggeletar, berpeluh atau pening: ambil 15 g gula segera, iaitu 3 sudu teh gula dalam air atau setengah gelas (150 ml) jus, dan semak semula selepas 15 minit.",
+    "Maklumkan kepada doktor, terutama jika anda guna insulin atau ubat kencing manis, kerana dos mungkin perlu diubah sebelum berangkat."], SRC.dm);
   if(c.hpt) g("🩺", "Darah tinggi", [bpT, "Garam bawah 5 g sehari, iaitu lebih kurang 1 sudu teh untuk sehari"], [
     "Ambil ubat setiap hari, walaupun rasa sihat.",
     "Kurangkan garam: elak ikan masin, budu, cencaluk, keropok, mi segera, kicap dan sos yang banyak, serta makanan bertin.",
@@ -796,6 +838,7 @@ function sync(){
   bc.className = "chip" + (bmi ? (bmi<18.5||bmi>=27.5 ? " hi" : bmi>=23 ? " mid" : " ok") : "");
   $("hb").disabled = !!S.hbUnk;
   $("dmBox").hidden = !S.conds.dm;
+  $("bpBox").hidden = !!S.conds.hpt;
   const rr = riskRange(), gg = guideline();
   $("barVal").textContent = gg.bad.length ? "Tidak layak" : rr ? TIERS[tierOf(rr[1])].short : "Isi profil";
   $("barVal").style.color = gg.bad.length ? "var(--ink)" : rr ? `var(--${TIERS[tierOf(rr[1])].k})` : "";
@@ -823,7 +866,7 @@ function renderResult(rr,g){
     <p class="tmean">${freq}</p>
     <div class="todo ${T.k}"><b>Apa perlu buat:</b> ${MSG.a}</div>
     ${rr[0]!==rr[1] ? `<p class="tmean" style="font-size:.85rem;margin-top:10px">Buat ujian HbA1c untuk mendapat keputusan yang lebih tepat.</p>` : ""}
-    <details class="doc"><summary>Butiran untuk doktor</summary><p>Anggaran kebarangkalian kejadian kesihatan serius (kematian, kemasukan wad fasiliti kesihatan haji, atau kemasukan hospital Arab Saudi): <b>${rangeTxt(rr)}</b>${rr[0]!==rr[1]?" (julat kerana HbA1c tidak diketahui)":""}. Purata kohort: ${COHORT}%. ${cmp}. Tahap: rendah &lt;1%, sederhana 1% hingga &lt;3%, tinggi ≥3%. Model HAJJFIT (elastic net; AUC 0.74).</p></details>`;
+    <details class="doc"><summary>Butiran untuk doktor</summary><p>Anggaran kebarangkalian kejadian kesihatan serius (kematian, kemasukan wad fasiliti kesihatan haji, atau kemasukan hospital Arab Saudi): <b>${rangeTxt(rr)}</b>${rr[0]!==rr[1]?" (julat kerana HbA1c tidak diketahui)":""}. Purata kohort: ${COHORT}%. ${cmp}. Tahap: rendah &lt;1%, sederhana 1% hingga &lt;3%, tinggi ≥3%. Model HAJJFIT (elastic net, Fasa 2 v9; AUC 0.74). Darah tinggi dalam model = diagnosis doktor atau bacaan ≥140/90 mmHg. Bacaan gula jari tidak digunakan dalam model.</p></details>`;
   requestAnimationFrame(()=>{ const n=$("needle"); if(n) n.style.transform=`rotate(${angleOf(hi)}deg)`; });
   const PRI={"⚠️":0,"📉":1,"🫀":2,"🫁":2,"🛡️":2,"🍚":2,"🥩":2,"🩺":3,"🫘":3,"🎗️":3,"🩸":4,"🧠":4,"🦽":4,"💉":4,"✅":5,"⚖️":5,"👤":5,"🚶":5,"🍔":6,"🦶":6,"🦴":6,"🦋":6,"☀️":9};
   const groups = advice().map((g,k)=>({...g,k})).sort((a,b)=>((PRI[a.e]??7)-(PRI[b.e]??7)) || a.k-b.k);
@@ -839,7 +882,7 @@ function renderResult(rr,g){
   const mr = MRS.find(m=>m.v===S.mrs);
   const d = new Date().toLocaleDateString("ms-MY",{day:"numeric",month:"long",year:"numeric"});
   $("printSum").innerHTML = `<h2 style="margin:0 0 4px">HAJJFIT · Ringkasan semakan kesihatan haji</h2><p class="sub" style="margin:0 0 10px">Tarikh: ${d}</p>
-    <p style="margin:0;font-size:.9rem;line-height:1.7">Jantina: ${S.sex==="M"?"Lelaki":"Perempuan"} · Umur: ${S.age} tahun · Tinggi ${S.ht} cm · Berat ${S.wt} kg · BMI ${bmiOf().toFixed(1)} · Hb: ${S.hbUnk||S.hb==null?"tidak diketahui":S.hb+" g/dL"}<br>Penyakit: ${conds}<br>HbA1c: ${a1c}<br>Kemampuan harian: ${mr?mr.t:"–"}</p>`;
+    <p style="margin:0;font-size:.9rem;line-height:1.7">Jantina: ${S.sex==="M"?"Lelaki":"Perempuan"} · Umur: ${S.age} tahun · Tinggi ${S.ht} cm · Berat ${S.wt} kg · BMI ${bmiOf().toFixed(1)} · Hb: ${S.hbUnk||S.hb==null?"tidak diketahui":S.hb+" g/dL"}<br>Penyakit: ${conds}<br>HbA1c: ${a1c} · Tekanan darah: ${S.conds.hpt?"darah tinggi (diagnosis)":((BP.find(b=>b[0]===S.bp)||[,"–"])[1])} · Gula jari: ${S.rbs!=null?S.rbs+" mmol/L":"–"}<br>Kemampuan harian: ${mr?mr.t:"–"}</p>`;
 }
 window.addEventListener("beforeprint",()=>{ document.querySelectorAll("#p3 details").forEach(d=>{ d.dataset.wasOpen=d.open?"1":""; d.open=true; }); });
 window.addEventListener("afterprint",()=>{ document.querySelectorAll("#p3 details").forEach(d=>{ d.open=!!d.dataset.wasOpen; }); });
@@ -881,7 +924,7 @@ const FAQ = [
  ["risk","Risiko saya tinggi. Adakah saya tidak boleh pergi?","Tidak semestinya. Risiko tinggi bermaksud anda perlu lebih bersedia: jumpa doktor awal, kawal penyakit sebaik mungkin, bawa ubat yang cukup dan berhati-hati semasa ibadah. Kelayakan tetap ditentukan oleh doktor pemeriksa."],
  ["risk","Saya tiada penyakit tetapi risiko masih sederhana. Kenapa?","Umur dan jantina juga mempengaruhi risiko. Jemaah yang lebih berusia dan lelaki secara purata lebih kerap mengalami kejadian serius walaupun tanpa penyakit kronik."],
  ["risk","Bagaimana cara menurunkan risiko saya?","Umur tidak boleh diubah, tetapi banyak faktor lain boleh diperbaiki: turunkan HbA1c jika ada kencing manis, rawat Hb yang rendah, naikkan berat jika terlalu kurus, kawal asma dan penyakit paru-paru, dan bina stamina dengan senaman. Lihat bahagian nasihat dalam keputusan anda."],
- ["risk","Apa maksud kotak hitam dan kotak kuning?","Kotak hitam menyenaraikan keadaan yang biasanya tidak diluluskan semasa saringan kesihatan, contohnya BMI 37.5 ke atas atau terlantar. Kotak kuning menyenaraikan keadaan yang perlu penilaian lanjut oleh doktor, contohnya HbA1c 8.5% hingga 10%."],
+ ["risk","Apa maksud kotak hitam dan kotak kuning?","Kotak hitam menyenaraikan keadaan yang biasanya tidak diluluskan semasa saringan kesihatan, contohnya BMI 37.5 ke atas atau terlantar. Kotak kuning menyenaraikan keadaan yang perlu penilaian lanjut oleh doktor, contohnya HbA1c 8.6% hingga 10%."],
  ["risk","Kenapa saya diminta buat ujian HbA1c?","Jika anda ada kencing manis tetapi tidak tahu bacaan HbA1c, tahap risiko dikira menggunakan anggaran yang lebih tinggi. Buat ujian HbA1c supaya keputusan anda lebih tepat."],
  ["risk","Saya tidak tahu bacaan Hb saya. Bagaimana?","Nilai purata jemaah mengikut jantina digunakan. Jika Hb anda sebenarnya rendah, risiko mungkin lebih tinggi daripada yang ditunjukkan. Buat ujian darah sebelum saringan."],
  ["fit","Berapa banyak senaman yang diperlukan?","Sasaran ialah sekurang-kurangnya 150 minit seminggu senaman intensiti sederhana, contohnya jalan pantas 30 minit sehari, 5 hari seminggu. Jika mampu, tingkatkan sehingga 300 minit seminggu. Tambah senaman kekuatan otot 2 hari seminggu."],
