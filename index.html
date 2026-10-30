@@ -866,7 +866,7 @@ function renderResult(rr,g){
     <p class="tmean">${freq}</p>
     <div class="todo ${T.k}"><b>Apa perlu buat:</b> ${MSG.a}</div>
     ${rr[0]!==rr[1] ? `<p class="tmean" style="font-size:.85rem;margin-top:10px">Buat ujian HbA1c untuk mendapat keputusan yang lebih tepat.</p>` : ""}
-    <details class="doc"><summary>Butiran untuk doktor</summary><p>Anggaran kebarangkalian kejadian kesihatan serius (kematian, kemasukan wad fasiliti kesihatan haji, atau kemasukan hospital Arab Saudi): <b>${rangeTxt(rr)}</b>${rr[0]!==rr[1]?" (julat kerana HbA1c tidak diketahui)":""}. Purata kohort: ${COHORT}%. ${cmp}. Tahap: rendah &lt;1%, sederhana 1% hingga &lt;3%, tinggi ≥3%. Model HAJJFIT (elastic net, Fasa 2 v9; AUC 0.74). Darah tinggi dalam model = diagnosis doktor atau bacaan ≥140/90 mmHg. Bacaan gula jari tidak digunakan dalam model.</p></details>`;
+    `;
   requestAnimationFrame(()=>{ const n=$("needle"); if(n) n.style.transform=`rotate(${angleOf(hi)}deg)`; });
   const PRI={"⚠️":0,"📉":1,"🫀":2,"🫁":2,"🛡️":2,"🍚":2,"🥩":2,"🩺":3,"🫘":3,"🎗️":3,"🩸":4,"🧠":4,"🦽":4,"💉":4,"✅":5,"⚖️":5,"👤":5,"🚶":5,"🍔":6,"🦶":6,"🦴":6,"🦋":6,"☀️":9};
   const groups = advice().map((g,k)=>({...g,k})).sort((a,b)=>((PRI[a.e]??7)-(PRI[b.e]??7)) || a.k-b.k);
