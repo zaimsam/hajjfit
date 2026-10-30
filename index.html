@@ -373,7 +373,6 @@ select{width:100%;font-size:1rem;font-weight:600;padding:14px;border-radius:14px
     </div>
     <div class="card">
       <h2>Bacaan gula jari (glucometer)</h2>
-      <p class="sub">Tidak wajib. Isi jika ada bacaan gula rawak terkini. Bacaan ini tidak mengubah anggaran risiko, hanya untuk nasihat.</p>
       <div class="stepper"><button type="button" data-step="rbs" data-d="-0.1" aria-label="Kurang bacaan gula">−</button><input type="number" id="rbs" min="1" max="35" step="0.1" inputmode="decimal" aria-label="Bacaan gula rawak"><span class="unit">mmol/L</span><button type="button" data-step="rbs" data-d="0.1" aria-label="Tambah bacaan gula">+</button></div>
       <p class="err" id="err1" hidden role="alert"></p>
     </div>
@@ -850,7 +849,6 @@ function sync(){
 function renderResult(rr,g){
   let al = "";
   if(g.bad.length) al += `<div class="alert bad"><span class="ai">${svg("alert")}</span><div><h3>Tidak memenuhi syarat kesihatan untuk menunaikan haji</h3><p>Berdasarkan maklumat anda, keadaan berikut tidak dibenarkan untuk menunaikan haji:</p><ul>${g.bad.map(x=>`<li>${x}</li>`).join("")}</ul>${g.temp?`<p style="margin-top:10px">Keadaan sementara seperti hamil, rawatan kanser, tibi, baru keluar wad atau HbA1c tinggi boleh dinilai semula selepas rawatan atau selepas tempoh tertentu.</p>`:""}<p style="margin-top:10px"><b>Sila jumpa doktor anda.</b> Keputusan rasmi dibuat semasa saringan kesihatan. Anggaran risiko tidak dipaparkan untuk keadaan ini.</p></div></div>`;
-  else al += `<div class="alert good"><span class="ai">${svg("check")}</span><div><h3>Tiada kriteria gagal dikesan</h3><p>Tiada keadaan yang biasanya menyebabkan gagal saringan.</p></div></div>`;
   if(g.warn.length) al += `<div class="alert warn"><span class="ai">${svg("info")}</span><div><h3>Perlu penilaian lanjut oleh doktor</h3><ul>${g.warn.map(x=>`<li>${x}</li>`).join("")}</ul></div></div>`;
   $("alerts").innerHTML = al;
   const rc = $("resultCard"); rc.hidden = !!g.bad.length;
