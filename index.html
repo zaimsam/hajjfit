@@ -348,9 +348,6 @@ select{width:100%;font-size:1rem;font-weight:600;padding:14px;border-radius:14px
         <div><p class="lbl">Berat</p><div class="stepper"><button type="button" data-step="wt" data-d="-1" aria-label="Kurang berat">−</button><input type="number" id="wt" min="25" max="200" inputmode="decimal" aria-label="Berat"><span class="unit">kg</span><button type="button" data-step="wt" data-d="1" aria-label="Tambah berat">+</button></div></div>
       </div>
       <p style="margin:12px 0 0"><span class="chip" id="bmiChip">BMI –</span></p>
-      <div class="field"><p class="lbl">Hemoglobin (Hb)</p>
-        <div class="stepper"><button type="button" data-step="hb" data-d="-0.1" aria-label="Kurang Hb">−</button><input type="number" id="hb" min="5" max="20" step="0.1" inputmode="decimal" aria-label="Hemoglobin"><span class="unit">g/dL</span><button type="button" data-step="hb" data-d="0.1" aria-label="Tambah Hb">+</button></div>
-        <label class="toggle"><input type="checkbox" id="hbUnk"> Saya tidak tahu nilai Hb saya</label></div>
       <p class="err" id="err0" hidden role="alert"></p>
     </div>
   </section>
@@ -361,19 +358,21 @@ select{width:100%;font-size:1rem;font-weight:600;padding:14px;border-radius:14px
       <p class="sub">Pilih semua yang pernah disahkan oleh doktor.</p>
       <div class="tiles" id="condList"></div>
     </div>
-    <div class="card" id="dmBox" hidden>
-      <h2>Bacaan HbA1c terkini</h2>
-      <p class="sub">Ujian gula 3 bulan, dalam tempoh 3 bulan lepas.</p>
-      <select id="hba1c" aria-label="HbA1c"></select>
-    </div>
     <div class="card" id="bpBox">
       <h2>Bacaan tekanan darah terkini</h2>
       <p class="sub">Bacaan di klinik atau di rumah dalam tempoh 3 bulan lepas.</p>
       <select id="bp" aria-label="Tekanan darah"></select>
     </div>
     <div class="card">
-      <h2>Bacaan gula jari (glucometer)</h2>
-      <div class="stepper"><button type="button" data-step="rbs" data-d="-0.1" aria-label="Kurang bacaan gula">−</button><input type="number" id="rbs" min="1" max="35" step="0.1" inputmode="decimal" aria-label="Bacaan gula rawak"><span class="unit">mmol/L</span><button type="button" data-step="rbs" data-d="0.1" aria-label="Tambah bacaan gula">+</button></div>
+      <h2>Ujian darah</h2>
+      <p class="sub">Isi berdasarkan keputusan ujian terkini, dalam tempoh 3 bulan lepas.</p>
+      <div class="field"><p class="lbl" style="text-transform:none">Hemoglobin (Hb)</p>
+        <div class="stepper"><button type="button" data-step="hb" data-d="-0.1" aria-label="Kurang Hb">−</button><input type="number" id="hb" min="5" max="20" step="0.1" inputmode="decimal" aria-label="Hemoglobin"><span class="unit">g/dL</span><button type="button" data-step="hb" data-d="0.1" aria-label="Tambah Hb">+</button></div>
+        <label class="toggle"><input type="checkbox" id="hbUnk"> Saya tidak tahu nilai Hb saya</label></div>
+      <div class="field" id="dmBox" hidden><p class="lbl" style="text-transform:none">HbA1c (ujian gula 3 bulan)</p>
+        <select id="hba1c" aria-label="HbA1c"></select></div>
+      <div class="field"><p class="lbl" style="text-transform:none">Gula jari (glucometer), jika ada</p>
+        <div class="stepper"><button type="button" data-step="rbs" data-d="-0.1" aria-label="Kurang bacaan gula">−</button><input type="number" id="rbs" min="1" max="35" step="0.1" inputmode="decimal" aria-label="Bacaan gula rawak"><span class="unit">mmol/L</span><button type="button" data-step="rbs" data-d="0.1" aria-label="Tambah bacaan gula">+</button></div></div>
       <p class="err" id="err1" hidden role="alert"></p>
     </div>
   </section>
@@ -536,8 +535,8 @@ function validate(st){
     if(!(S.age>=18 && S.age<=100)){ miss.push("umur (18 hingga 100 tahun)"); mark.push($("age").parentNode); }
     if(!(S.ht>=120 && S.ht<=210)){ miss.push("tinggi (120 hingga 210 cm)"); mark.push($("ht").parentNode); }
     if(!(S.wt>=25 && S.wt<=200)){ miss.push("berat (25 hingga 200 kg)"); mark.push($("wt").parentNode); }
-    if(!S.hbUnk && !(S.hb>=5 && S.hb<=20)){ miss.push("nilai Hb, atau tandakan \u201cSaya tidak tahu\u201d"); mark.push($("hb").parentNode); }
   }
+  if(st===1 && !S.hbUnk && !(S.hb>=5 && S.hb<=20)){ miss.push("nilai Hb, atau tandakan \u201cSaya tidak tahu\u201d"); mark.push($("hb").parentNode); }
   if(st===1 && S.conds.dm && !S.hba1c){ miss.push("bacaan HbA1c (pilih \u201cSaya tidak tahu\u201d jika tiada)"); mark.push($("hba1c")); }
   if(st===1 && !S.conds.hpt && !S.bp){ miss.push("bacaan tekanan darah (pilih \u201cSaya tidak tahu\u201d jika tiada)"); mark.push($("bp")); }
   if(st===1 && S.rbs!=null && !(S.rbs>=1 && S.rbs<=35)){ miss.push("bacaan gula jari (1 hingga 35 mmol/L), atau biarkan kosong"); mark.push($("rbs").parentNode); }
